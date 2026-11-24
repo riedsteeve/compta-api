@@ -38,4 +38,12 @@ Connection imposible a la base de donnée.
 2026-11-24T15:05:11.698+01:00  WARN 26852 --- [compta-api] [           main] org.hibernate.orm.jdbc                   : HHH100046: Could not obtain connection to query JDBC database metadata
 `
 
-6 : 
+6 - Commit
+
+7 - Le lancement de l'application n'a pas marché car le schéma de la base de donée n'est pas correct, du au changement de dte_cmd a date_commande. 
+Je vois aussi dans le terminal que ça me proposait de le générer.
+
+C'est une bonne nouvelle en ce sens ou ça nous averti que le schéma de BDD n'est pas correcte, donc une possibilité de changement.
+Par contre si c'étais un `upadate` a la place du validate ca aurais potentielement causé des dégats 😅
+
+8 - Celui qui gagne est le fichier car c'est lui qui a été défini lors de la compilation.
