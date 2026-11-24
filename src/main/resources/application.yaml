@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: compta-api
+  datasource:
+    url: jdbc:mariadb://localhost:${DB_PORT:3306}/compta
+    username: ${DB_USER:app}
+    password: ${DB_PASSWORD:app}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+server:
+  port: 8081
