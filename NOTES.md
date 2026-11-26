@@ -91,13 +91,3 @@ Hibernate: select f1_0.id,f1_0.rue,f1_0.code_postal,f1_0.ville,f1_0.nom from fou
 Hibernate: select f1_0.id,f1_0.rue,f1_0.code_postal,f1_0.ville,f1_0.nom from fournisseur f1_0 where f1_0.id=?
 `
 
-
-
-Explication des lignes :
-
-- **Ligne 1** `select ... from article a1_0 order by a1_0.ref` : c'est la requête générée par `findAllByOrderByRefAsc()`, appelée dans `CatalogueService.tous()`. Elle charge tous les articles triés par référence. Elle ne lit que la colonne `id_fou` du fournisseur, pas le fournisseur lui-même, car `Article.fournisseur` est en `FetchType.LAZY` : Hibernate met à la place un proxy vide qui ne connaît que l'id.
-- **Lignes 2 à 4** `select ... from fournisseur f1_0 where f1_0.id=?` : chacune charge **un** fournisseur. Elles sont déclenchées par `ArticleDto.of`, qui appelle `a.getFournisseur().getNom()`. Le premier accès à `getNom()` sur un proxy oblige Hibernate à aller chercher le fournisseur en base. Ça marche uniquement parce que la transaction (`@Transactional(readOnly = true)`) est encore ouverte.
-
-Ce qui fixe leur nombre : **1 requête pour les articles + 1 requête par fournisseur distinct** présent dans les articles. Ma base a 12 articles répartis sur 3 fournisseurs (Française d'Imports, FDM SA, Dubois & Fils), d'où 1 + 3 = 4 requêtes, et non 1 + 12. Une fois qu'un fournisseur est chargé, il reste dans le contexte de persistance (le cache de premier niveau de la transaction) : les autres articles du même fournisseur le réutilisent sans nouvelle requête.
-
-C'est le problème du **N+1** : si on ajoute des fournisseurs, le nombre de requêtes augmente avec eux. On pourrait tout charger en une seule requête avec un `JOIN FETCH` (`@Query`) ou un `@EntityGraph(attributePaths = "fournisseur")` sur la méthode du repository.
